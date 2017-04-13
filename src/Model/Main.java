@@ -36,21 +36,24 @@ public class Main extends Application {
         
         List<Animation> listAnim = new ArrayList<>();
         Path bound = new Bounds().getBounds();
-        Tank player = new Tank(".\\sprite\\Tank-GTAA-1.png", "player", bound);
-        Tank enemy = new Tank(".\\sprite\\Tank-GTAA-1.png", "enemy", bound);
+        RotateTransition boundColl = new RotateTransition();
+        Tank player = new Tank(".\\sprite\\Tank-GTAA-1.png", "player");
+        Tank enemy = new Tank(".\\sprite\\Tank-GTAA-1.png", "enemy");
         
-        RotateTransition rotate1 = player.turnLeft();
-        RotateTransition rotate2 = player.turnLeft();
-        RotateTransition rotate3 = player.turnLeft();
+//        RotateTransition rotate1 = player.turnLeft();
+//        RotateTransition rotate2 = player.turnLeft();
+//        RotateTransition rotate3 = player.turnLeft();
         RotateTransition rotate4 = player.turnLeft();
-        TranslateTransition translate1 = player.walk();
-        TranslateTransition translate2 = player.walk();
-        listAnim.add(rotate1);
-        listAnim.add(rotate2);
-        listAnim.add(rotate3);
         listAnim.add(rotate4);
+        
+        TranslateTransition translate1 = player.walk();
         listAnim.add(translate1);
+        
+        TranslateTransition translate2 = player.walk();
         listAnim.add(translate2);
+//        listAnim.add(rotate1);
+//        listAnim.add(rotate2);
+//        listAnim.add(rotate3);
         
         Animation[] anim = new Animation[listAnim.size()];
         anim = listAnim.toArray(anim);
@@ -71,10 +74,6 @@ public class Main extends Application {
         
         stage.show();
         
-    }
-    
-    public synchronized void waitAnim() throws InterruptedException {
-        wait(1000);
     }
     
     public static void main(String[] args) {

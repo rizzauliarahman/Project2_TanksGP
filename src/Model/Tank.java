@@ -22,12 +22,10 @@ import javafx.util.Duration;
 public class Tank {
     Image image;
     ImageView object;
-    double initDirection;
-    double[] initPos = new double[2];
-    Path bound;
-    double init_x, init_y, dx, dy, x_pos, y_pos;
+    double init_dir, current_dir;
+    double init_x, init_y, dx = 0, dy = 0, x_pos, y_pos;
     
-    public Tank(String filename, String type, Path bound) throws Exception {
+    public Tank(String filename, String type) throws Exception {
         image = new Image(new FileInputStream(filename));
         object = new ImageView(image);
         object.setFitHeight(100);
@@ -43,11 +41,9 @@ public class Tank {
         }
         System.out.println(object.getX() + ", " + object.getY() + ", " + object.getRotate());
         
-        initDirection = object.getRotate();
-        initPos[0] = object.getX();
-        initPos[1] = object.getY();
-        
-        this.bound = bound;
+        init_dir = current_dir = object.getRotate();
+        init_x = x_pos = object.getX();
+        init_y = y_pos = object.getY();
         
         object.setPreserveRatio(true);
         
@@ -61,53 +57,52 @@ public class Tank {
         TranslateTransition translate = new TranslateTransition(Duration.millis(1000));
         translate.setNode(object);
         
-        if ((object.getX() >= 25 && object.getX() <= 1150) &&
-                (object.getY() >= 25 && object.getY() <= 550)) {
+        if ((this.x_pos >= 25 && this.x_pos <= 1150) &&
+                (this.y_pos >= 25 && this.y_pos <= 550)) {
             
-            if (object.getRotate() == 45) {
+            if (current_dir == 45) {
                 translate.setByX(-30);
                 translate.setByY(-30);
-                object.setX(object.getX() - 30);
-                object.setY(object.getY() - 30);
-            } else if (object.getRotate() == 90) {
+                dx -= 30;
+                dy -= 30;
+            } else if (current_dir == 90) {
                 translate.setByY(-50);
-                object.setY(object.getY() - 50);
-            } else if (object.getRotate() == 135) {
+                dy -= 50;
+            } else if (current_dir == 135) {
                 translate.setByX(30);
                 translate.setByY(-30);
-                object.setX(object.getX() + 30);
-                object.setY(object.getY() - 30);
-            } else if (object.getRotate() == 180) {
+                dx += 30;
+                dy -= 30;
+            } else if (current_dir == 180) {
                 translate.setByX(-50);
-                object.setX(object.getX() - 50);
-            } else if (object.getRotate() == 225) {
+                dx -= 50;
+            } else if (current_dir == 225) {
                 translate.setByX(30);
                 translate.setByY(30);
-                object.setX(object.getX() + 30);
-                object.setY(object.getY() + 30);
-            } else if (object.getRotate() == 270) {
+                dx += 30;
+                dy += 30;
+            } else if (current_dir == 270) {
                 translate.setByY(50);
-                object.setY(object.getY() + 50);
-            } else if (object.getRotate() == 315) {
+                dy += 50;
+            } else if (current_dir == 315) {
                 translate.setByX(-30);
                 translate.setByY(30);
-                object.setX(object.getX() - 30);
-                object.setY(object.getY() + 30);
-            } else if (object.getRotate() == 0) {
+                dx -= 30;
+                dx += 30;
+            } else if (current_dir == 0) {
                 translate.setByX(50);
-                object.setX(object.getX() + 50);
+                dx += 50;
             }
-            System.out.println(object.getX() + ", " + object.getY() + ", " + object.getRotate());
+            
+            this.x_pos += dx;
+            this.y_pos += dy;
+            
+            
+            System.out.println(this.x_pos + ", " + this.y_pos + ", " + this.current_dir);
             
         } else {
-            RotateTransition rotate = new RotateTransition(Duration.millis(1000));
-            System.out.println("a");
-            rotate.setNode(object);
-            rotate.setToAngle(initDirection);
-            rotate.play();
+            translate = this.back();
             
-            translate.setToX(initPos[0]);
-            translate.setToY(initPos[1]);
         }
         
         return translate;
@@ -118,6 +113,7 @@ public class Tank {
         rotate.setNode(object);
         
         rotate.setByAngle(45);
+        current_dir += 45;
         
         return rotate;
     }
@@ -127,8 +123,58 @@ public class Tank {
         rotate.setNode(object);
         
         rotate.setByAngle(-45);
+        current_dir -= 45;
         
         return rotate;
     }
+    
+    public TranslateTransition back() {
+        TranslateTransition translate = new TranslateTransition(Duration.millis(1000));
+        translate.setNode(object);
+        
+        if (current_dir == 45) {
+            translate.setByX(30);
+            translate.setByY(30);
+            dx += 30;
+            dy += 30;
+        } else if (current_dir == 90) {
+            translate.setByY(50);
+            dy += 50;
+        } else if (current_dir == 135) {
+            translate.setByX(-30);
+            translate.setByY(30);
+            dx -= 30;
+            dy += 30;
+        } else if (current_dir == 180) {
+            translate.setByX(50);
+            dx += 50;
+        } else if (current_dir == 225) {
+            translate.setByX(-30);
+            translate.setByY(-30);
+            dx -= 30;
+            dy -= 30;
+        } else if (current_dir == 270) {
+            translate.setByY(-50);
+            dy -= 50;
+        } else if (current_dir == 315) {
+            translate.setByX(30);
+            translate.setByY(-30);
+            dx += 30;
+            dx -= 30;
+        } else if (current_dir == 0) {
+            translate.setByX(-50);
+            dx -= 50;
+        }
+
+        this.x_pos += dx;
+        this.y_pos += dy;
+
+
+        System.out.println(this.x_pos + ", " + this.y_pos + ", " + this.current_dir);
+        
+        return translate;
+        
+    }
+    
     
 }
