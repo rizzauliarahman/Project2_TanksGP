@@ -6,8 +6,11 @@
 package Model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 /**
  *
@@ -19,24 +22,34 @@ public class GeneticAlgorithm {
     int tournamentSize = 3;
     double crossoverRate = 0.9, mutationRate = 0.1;
     
-    public Chromosome roulette(Population pop) {
+    public Chromosome[] roulette(Population pop) {
+        Chromosome[] tmp = new Chromosome[2];
         float total = pop.getTotalFitness();
         
         total *= new Random().nextFloat();
         
-        int p = 0, x = 0;
+        double fitnessTaken = 0;
         
-        while ((p < total) && (x < pop.getPopulation().length)) {
-            p += pop.getPopulation()[x].getFitness();
-            x++;
+        for (int i = 0; i < 2; i++) {
+            int x = 0;
+            double p = 0;
+            total -= fitnessTaken;
+            while ((p < total) && (x < pop.getPopulation().length)) {
+                p += pop.getPopulation()[x].getFitness();
+                x++;
+            }
+            
+            if (x == 0) {
+                tmp[i] =  pop.getPopulation()[x];
+                fitnessTaken += pop.getPopulation()[x].getFitness();
+            } else {
+                tmp[i] = pop.getPopulation()[x-1];
+                fitnessTaken += pop.getPopulation()[x-1].getFitness();
+            }
+            
         }
         
-        if (x == 0) {
-            return pop.getPopulation()[x];
-        } else {
-            return pop.getPopulation()[x-1];
-        }
-        
+        return tmp;
     }
     
     public Chromosome tournament(Population pop) {
@@ -52,6 +65,7 @@ public class GeneticAlgorithm {
                 rand = new Random().nextInt(pop.getPopulation().length) + 0;
             } while (numOut.contains(rand));
             tmp.getPopulation()[i] = pop.getPopulation()[rand];
+            tmp.setNChromosome();
             numOut.add(rand);
         }
         
@@ -70,15 +84,17 @@ public class GeneticAlgorithm {
         
         if (sel == 0) {
             do {
-                p1 = roulette(pop);
-                p2 = roulette(pop);
+                Chromosome[] tmp = roulette(pop);
+                p1 = tmp[0];
+                p2 = tmp[1];
             } while (p1.equals(p2));
-        } else if (sel == 1) {
+        } else if (sel == 1) {            
             do {
                 p1 = tournament(pop);
                 p2 = tournament(pop);
             } while (p1.equals(p2));
         }
+        
         
         parent[0] = p1;
         parent[1] = p2;
@@ -89,8 +105,6 @@ public class GeneticAlgorithm {
         Chromosome[] child = new Chromosome[2];
         
         parentSelection(pop);
-        
-        System.out.println(parent[0].getGenes().length);
         
         int size1 = parent[0].getGenes().length;
         int size2 = parent[1].getGenes().length;
@@ -177,11 +191,11 @@ public class GeneticAlgorithm {
         
     }
     
-    public boolean termination(Double[] fittestList) {
+    public boolean termination(Double[] fittestList, Population pop) {
         double fit = fittestList[0];
-        int count = -1;
+        int count = -1, i = 0;
         
-        for (int i = 0; i < fittestList.length; i++) {
+        for (i = 0; i < fittestList.length; i++) {
             if (fittestList[i] == fit) {
                 count += 1;
             } else {
@@ -190,10 +204,13 @@ public class GeneticAlgorithm {
             }
         }
         
-        if (count < 6) {
-            return false;
-        } else {
+        Set<Chromosome> tmp = new HashSet<>();
+        tmp.addAll(Arrays.asList(pop.getPopulation()));
+        
+        if ((count >= 10) || (tmp.size() == 1)) {
             return true;
+        } else {
+            return false;
         }
         
     }
@@ -208,6 +225,13 @@ public class GeneticAlgorithm {
     
     public double getMutationRate() {
         return mutationRate;
+    }
+    
+    public Chromosome enemyMoves(int stepsCount) {
+        Chromosome enemy = new Chromosome();
+        enemy.createEnemyGenes(stepsCount);
+        
+        return enemy;
     }
     
 }

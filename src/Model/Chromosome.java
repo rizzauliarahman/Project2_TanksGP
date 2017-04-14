@@ -35,7 +35,7 @@ public class Chromosome {
         return fitness;
     }
     
-    public void createGenes() {
+    public void createPlayerGenes() {
         List<String> list = new ArrayList<>();
         
         int projHealth = 100;
@@ -44,11 +44,26 @@ public class Chromosome {
             String taken = this.steps[new Random().nextInt(steps.length)];
             
             if (taken.equals("fire")) {
-                projHealth -= new Random().nextFloat() * 10;
+                projHealth -= new Random().nextFloat() * 5;
             }
             
             list.add(taken);
             
+        }
+        
+        this.genes = new String[list.size()];
+        this.genes = list.toArray(this.genes);
+        setFitness();
+        
+    }
+    
+    public void createEnemyGenes(int stepsCount) {
+        List<String> list = new ArrayList<>();
+        
+        for (int i = 0; i < stepsCount; i++) {
+            String taken = this.steps[new Random().nextInt(steps.length)];
+            
+            list.add(taken);            
         }
         
         this.genes = new String[list.size()];

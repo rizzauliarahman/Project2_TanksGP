@@ -10,6 +10,8 @@ import java.io.FileNotFoundException;
 import java.util.Random;
 import javafx.animation.RotateTransition;
 import javafx.animation.TranslateTransition;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.effect.SepiaTone;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.shape.Ellipse;
@@ -29,6 +31,7 @@ public class Tank {
     double gun_x, gun_y;
     int health;
     Bullet bulletObj;
+    String name;
     
     public Tank(String filename, String type) throws Exception {
         image = new Image(new FileInputStream(filename));
@@ -38,22 +41,23 @@ public class Tank {
         
         if (type.toUpperCase().equals("PLAYER")) {
             object.setRotate(180);
-            object.setX(50);
-            object.setY(50);
+            object.setX(200);
+            object.setY(200);
             gun_x = object.getX() + 50;
             gun_y = object.getY() + 15;
         } else if (type.toUpperCase().equals("ENEMY")) {
-            object.setX(1100);
-            object.setY(50);
-            gun_x = object.getX() - 50;
-            gun_y = object.getY() - 15;
+            object.setX(1000);
+            object.setY(200);
+            gun_x = object.getX();
+            gun_y = object.getY() + 15;
+            object.setEffect(new SepiaTone(0.5));
         }
-        System.out.println(object.getX() + ", " + object.getY() + ", " + object.getRotate());
         
         init_dir = current_dir = object.getRotate();
         init_x = x_pos = object.getX();
         init_y = y_pos = object.getY();
         health = 100;
+        name = type;
         
         object.setPreserveRatio(true);
         
@@ -64,13 +68,13 @@ public class Tank {
     }
     
     public TranslateTransition walk() {
-        TranslateTransition translate = new TranslateTransition(Duration.millis(1000));
+        TranslateTransition translate = new TranslateTransition(Duration.millis(500));
         translate.setNode(object);
         
         dx = dy = 0;
         
-        if ((this.x_pos >= 25 && this.x_pos <= 1150) &&
-                (this.y_pos >= 25 && this.y_pos <= 550)) {
+        if ((this.x_pos >= 100 && this.x_pos <= 1100) &&
+                (this.y_pos >= 75 && this.y_pos <= 525)) {
             
             if (current_dir == 90) {
                 translate.setByY(-50);
@@ -91,22 +95,22 @@ public class Tank {
             this.gun_x += dx;
             this.gun_y += dy;
             
-            System.out.println(this.x_pos + ", " + this.y_pos + ", " + this.current_dir);
+//            System.out.println(this.x_pos + " " + this.y_pos + " " + this.current_dir);
             
         } else {
-            if (this.x_pos < 25) {
+            if (this.x_pos < 100) {
                 if (this.current_dir == 0) {
                     return back();
                 }                    
-            } else if (this.x_pos > 1150) {
+            } else if (this.x_pos > 1100) {
                 if (this.current_dir == 180) {
                     return back();
                 }
-            } else if (this.y_pos < 25) {
+            } else if (this.y_pos < 75) {
                 if (this.current_dir == 90) {
                     return back();
                 }
-            } else if (this.y_pos > 550) {
+            } else if (this.y_pos > 525) {
                 if (this.current_dir == 270) {
                     return back();
                 }
@@ -118,7 +122,7 @@ public class Tank {
     }
     
     public RotateTransition turnRight() {
-        RotateTransition rotate = new RotateTransition(Duration.millis(1000));
+        RotateTransition rotate = new RotateTransition(Duration.millis(500));
         rotate.setNode(object);
         
         rotate.setByAngle(90);
@@ -142,11 +146,13 @@ public class Tank {
             gun_y += 25;
         }
         
+//        System.out.println(this.x_pos + " " + this.y_pos + " " + this.current_dir);
+        
         return rotate;
     }
     
     public RotateTransition turnLeft() {
-        RotateTransition rotate = new RotateTransition(Duration.millis(1000));
+        RotateTransition rotate = new RotateTransition(Duration.millis(500));
         rotate.setNode(object);
         
         rotate.setByAngle(-90);
@@ -170,11 +176,13 @@ public class Tank {
             gun_y -= 25;
         }
         
+//        System.out.println(this.x_pos + " " + this.y_pos + " " + this.current_dir);
+        
         return rotate;
     }
     
     public TranslateTransition back() {
-        TranslateTransition translate = new TranslateTransition(Duration.millis(1000));
+        TranslateTransition translate = new TranslateTransition(Duration.millis(500));
         translate.setNode(object);
         
         dx = dy = 0;
@@ -193,12 +201,12 @@ public class Tank {
             dx += 50;
         }
 
+//        System.out.println(this.x_pos + " " + this.y_pos + " " + this.current_dir);
+        
         this.x_pos += dx;
         this.y_pos += dy;
         this.gun_x += dx;
         this.gun_y += dy;
-
-        System.out.println(this.x_pos + ", " + this.y_pos + ", " + this.current_dir);
         
         return translate;
         
@@ -215,6 +223,8 @@ public class Tank {
         bulletObj = new Bullet(gun_x, gun_y, current_dir);
         TranslateTransition translate = bulletObj.walk(current_dir, tank);
         
+//        System.out.println(this.x_pos + " " + this.y_pos + " " + this.current_dir);
+        
         return translate;
     }
     
@@ -224,6 +234,22 @@ public class Tank {
     
     public int getHealth() {
         return health;
+    }
+    
+    public String getName() {
+        return name;
+    }
+    
+    public double getXPos() {
+        return this.x_pos;
+    }
+    
+    public double getYPos() {
+        return this.y_pos;
+    }
+    
+    public Rectangle2D getBoundary() {
+        return new Rectangle2D(x_pos, y_pos, 75, 75);
     }
     
 }

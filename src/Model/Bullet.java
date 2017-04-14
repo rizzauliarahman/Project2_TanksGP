@@ -6,6 +6,7 @@
 package Model;
 
 import javafx.animation.TranslateTransition;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
@@ -23,7 +24,7 @@ public class Bullet {
     
     public Bullet(double x_pos, double y_pos, double direction) {
         ellipse = new Ellipse(x_pos, y_pos, 5, 2.5);
-        ellipse.setFill(Color.BURLYWOOD);
+        ellipse.setFill(Color.ORANGERED);
         init_x = this.x_pos = x_pos;
         init_y = this.y_pos = y_pos;
         
@@ -48,35 +49,35 @@ public class Bullet {
         dx = dy = 0;
         translate.setNode(ellipse);
         
-        while ((!tank.getTank().contains(x_pos, y_pos)) && 
-                ((x_pos >= 25 && x_pos <= 1150) && 
-                (y_pos >= 25 && y_pos <= 550))) {
+        while ((!checkHit(tank)) && 
+                ((x_pos >= 0 && x_pos <= 1200) && 
+                (y_pos >= 0 && y_pos <= 600))) {
             
-            ms += 10;
+            ms += 0.5;
             translate.setDuration(Duration.millis(ms));
             
             double tmp_x = 0, tmp_y = 0;
             
             if (direction == 45) {
-                tmp_x -= 5;
-                tmp_y -= 5;
+                tmp_x -= 1;
+                tmp_y -= 1;
             } else if (direction == 90) {
-                tmp_y -= 5;
+                tmp_y -= 1;
             } else if (direction == 135) {
-                tmp_x += 5;
-                tmp_y -= 5;
+                tmp_x += 1;
+                tmp_y -= 1;
             } else if (direction == 180) {
-                tmp_x += 5;
+                tmp_x += 1;
             } else if (direction == 225) {
-                tmp_x += 5;
-                tmp_y += 5;
+                tmp_x += 1;
+                tmp_y += 1;
             } else if (direction == 270) {
-                tmp_y += 5;
+                tmp_y += 1;
             } else if (direction == 315) {
-                tmp_x -= 5;
-                tmp_x += 5;
+                tmp_x -= 1;
+                tmp_x += 1;
             } else if (direction == 0) {
-                tmp_x -= 5;
+                tmp_x -= 1;
             }
             
             dx += tmp_x;
@@ -89,11 +90,23 @@ public class Bullet {
         translate.setByX(dx);
         translate.setByY(dy);        
         
-        if (tank.getTank().contains(x_pos, y_pos)) {
+        if (checkHit(tank)) {
+//            System.out.print("Hit ");
             tank.getHit(power);
         }
         
         return translate;
+    }
+    
+    public boolean checkHit(Tank tank) {
+        if (tank.getBoundary().intersects(this.getBoundary())) {
+                return true;    
+        }
+        return false;
+    }
+    
+    public Rectangle2D getBoundary() {
+        return new Rectangle2D(x_pos, y_pos, 5, 5);
     }
     
 }

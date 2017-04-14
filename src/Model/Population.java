@@ -15,6 +15,7 @@ public class Population {
     
     public Population() {
         population = new Chromosome[10];
+        nChromosome = 0;
     }
     
     public void showPopulation() {
@@ -36,7 +37,7 @@ public class Population {
             
             do {
                 c = new Chromosome();
-                c.createGenes();
+                c.createPlayerGenes();
                 
                 boolean[] duplicateFound = new boolean[population.length];
                 
@@ -44,7 +45,7 @@ public class Population {
                 
                 if (i != 0) {
                     
-                    for (int k = 0; i < nChromosome; k++) {
+                    for (int k = 0; k < nChromosome; k++) {
                         found = true;
                         Chromosome ch = population[k];
 
@@ -69,7 +70,8 @@ public class Population {
                     }
 
                     found = false;
-                    for (boolean b : duplicateFound) {
+                    for (int k = 0; k < nChromosome; k++) {
+                        boolean b = duplicateFound[k];
                         found = found || b;
                     }
                 }
@@ -108,6 +110,14 @@ public class Population {
         }
         
         return total;
+    }
+    
+    public void setNChromosome() {
+        this.nChromosome++;
+    }
+    
+    public int getNChromosome() {
+        return nChromosome;
     }
     
 }

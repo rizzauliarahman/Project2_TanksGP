@@ -13,6 +13,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
+import javafx.animation.ParallelTransition;
 import javafx.animation.PauseTransition;
 import javafx.animation.RotateTransition;
 import javafx.animation.SequentialTransition;
@@ -48,6 +49,8 @@ public class Main extends Application {
         
         boolean terminate = false;    
         List<Double> fittestList = new ArrayList<>();
+        double minEnemyHealth = 9999;
+        int minStepsTaken = 9999;
         
         while (!terminate) {
             
@@ -76,79 +79,135 @@ public class Main extends Application {
             fittestList.add(c.getFitness());
             Double[] tmp = new Double[fittestList.size()];
             tmp = fittestList.toArray(tmp);
-            
-            terminate = GA.termination(tmp);
 
             List<Animation> listAnim = new ArrayList<>();
-            int factor = 0;
-
-//            do {
-
-                factor++;
-                for (String s : c.getGenes()) {
-                    if (s.equals("walk")) {
-                        TranslateTransition translate = player.walk();
-                        listAnim.add(translate);
-                    } else if (s.equals("turnRight")) {
-                        RotateTransition rotate = player.turnRight();
-                        listAnim.add(rotate);
-                    } else if (s.equals("turnLeft")) {
-                        RotateTransition rotate = player.turnLeft();
-                        listAnim.add(rotate);
-                    } else if (s.equals("fire")) {
-                        TranslateTransition translate = player.fire(enemy);
-                        
-                        Ellipse bullet = player.getBullet().getBullet();
-                        listBullet.add(bullet);
-
-                        FadeTransition fade1 = new FadeTransition(Duration.millis(10), player.getBullet().getBullet());
-                        fade1.setFromValue(0);
-                        fade1.setToValue(1);
-                        fade1.setCycleCount(1);
-
-                        FadeTransition fade2 = new FadeTransition(Duration.millis(10), player.getBullet().getBullet());
-                        fade2.setFromValue(1);
-                        fade2.setToValue(0);
-                        fade2.setCycleCount(1);
-
-                        listAnim.add(fade1);
-                        listAnim.add(translate);
-                        listAnim.add(fade2);
-                    }
-                    System.out.println(s);
-                }
-
-//            } while ((player.getHealth() != 0) && (enemy.getHealth() != 0));
             
-            Text text = new Text(10, 580, "Generation - " + j + ", Best Fitness : " + c.getFitness() * factor);
-            text.setFont(Font.font("Verdana", 20));
+            Chromosome enemyMoves = GA.enemyMoves(c.getGenes().length);
+            
+            List<Animation> listEnemy = new ArrayList<>();
+            
+            for (int m = 0; m < c.getGenes().length; m++) {
+                String s = c.getGenes()[m];
+                String e = enemyMoves.getGenes()[m];
+                if (s.equals("walk")) {
+                    TranslateTransition translate = player.walk();
+                    listAnim.add(translate);
+                } else if (s.equals("turnRight")) {
+                    RotateTransition rotate = player.turnRight();
+                    listAnim.add(rotate);
+                } else if (s.equals("turnLeft")) {
+                    RotateTransition rotate = player.turnLeft();
+                    listAnim.add(rotate);
+                } else if (s.equals("fire")) {
+//                    System.out.print("fire ");
+                    TranslateTransition translate = player.fire(enemy);
+
+                    Ellipse bullet = player.getBullet().getBullet();
+                    listBullet.add(bullet);
+
+                    FadeTransition fade1 = new FadeTransition(Duration.millis(10), player.getBullet().getBullet());
+                    fade1.setFromValue(0);
+                    fade1.setToValue(1);
+                    fade1.setCycleCount(1);
+
+                    FadeTransition fade2 = new FadeTransition(Duration.millis(10), player.getBullet().getBullet());
+                    fade2.setFromValue(1);
+                    fade2.setToValue(0);
+                    fade2.setCycleCount(1);
+
+                    listAnim.add(fade1);
+                    listAnim.add(translate);
+                    listAnim.add(fade2);
+                }
+                
+                if (e.equals("walk")) {
+                    TranslateTransition translate = enemy.walk();
+                    listEnemy.add(translate);
+                } else if (e.equals("turnRight")) {
+                    RotateTransition rotate = enemy.turnRight();
+                    listEnemy.add(rotate);
+                } else if (e.equals("turnLeft")) {
+                    RotateTransition rotate = enemy.turnLeft();
+                    listEnemy.add(rotate);
+                } else if (e.equals("fire")) {
+//                    System.out.print("fire ");
+                    TranslateTransition translate = enemy.fire(player);
+
+                    Ellipse bullet = enemy.getBullet().getBullet();
+                    listBullet.add(bullet);
+
+                    FadeTransition fade1 = new FadeTransition(Duration.millis(10), enemy.getBullet().getBullet());
+                    fade1.setFromValue(0);
+                    fade1.setToValue(1);
+                    fade1.setCycleCount(1);
+
+                    FadeTransition fade2 = new FadeTransition(Duration.millis(10), enemy.getBullet().getBullet());
+                    fade2.setFromValue(1);
+                    fade2.setToValue(0);
+                    fade2.setCycleCount(1);
+
+                    listEnemy.add(fade1);
+                    listEnemy.add(translate);
+                    listEnemy.add(fade2);
+                }
+            }
+            
+            if (enemy.getHealth() == minEnemyHealth) {
+                if (c.getGenes().length < minStepsTaken) {
+                    minStepsTaken = c.getGenes().length;
+                }
+            } else if (enemy.getHealth() < minEnemyHealth) {
+                minEnemyHealth = enemy.getHealth();
+                minStepsTaken = c.getGenes().length;
+            }
+            
+            Text text1 = new Text(10, 560, "Generation - " + j + ", Enemy Health Remaining : " + 
+                    enemy.getHealth() + ", Player Health Remaining : " + player.getHealth());
+            Text text2 = new Text(10, 580, "Best Record : " + minEnemyHealth + " health remaining with " +
+                    minStepsTaken + " steps taken");
+            text1.setFont(Font.font("Verdana", 12));
+            text2.setFont(Font.font("Verdana", 12));
             
             PauseTransition delay = new PauseTransition(Duration.millis(2000));
             delay.setOnFinished(event -> stage.close());
             listAnim.add(delay);
+            listEnemy.add(delay);
             
             Animation[] anim = new Animation[listAnim.size()];
             anim = listAnim.toArray(anim);
             
-            SequentialTransition seq = new SequentialTransition(anim);
-            seq.play();
+//            ParallelTransition par = new ParallelTransition(anim);
+//            par.getChildren().addAll(enemyMovement);
+//            
+//            par.play();
+            
+            Animation[] enemyMovement = new Animation[listEnemy.size()];
+            enemyMovement = listEnemy.toArray(enemyMovement);
+            
+            SequentialTransition seq1 = new SequentialTransition(anim);
+            seq1.play();
+            
+            SequentialTransition seq2 = new SequentialTransition(enemyMovement);
+            seq2.play();
             
             i++;
             
-            terminate = true;
+            terminate = GA.termination(tmp, pop);
+            
+//            terminate = true;
             
             ImageView playerObj = player.getTank();
             ImageView enemyObj = enemy.getTank();
 
-            Group root = new Group(playerObj, enemyObj, bound, text);
+            Group root = new Group(playerObj, enemyObj, bound, text1, text2);
             for (Ellipse e : listBullet) {
                 root.getChildren().add(e);
             }
 
             Scene scene = new Scene(root, 1200, 600);
+            scene.setFill(Color.LIGHTYELLOW);
 
             stage.setTitle("Load Tank");
-            
 
             stage.setScene(scene);
 
@@ -156,6 +215,9 @@ public class Main extends Application {
             
         }
         
+        System.out.println("Generations count : " + i);
+        System.out.println("Minimum Steps count : " + minStepsTaken);
+        System.out.println("Maximum Damage Dealt : " + (100 - minEnemyHealth));
         
     }
     
