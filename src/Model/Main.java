@@ -40,40 +40,88 @@ import javafx.util.Duration;
  */
 public class Main extends Application {
 
+    
+    /**
+     * main method that will be called when the application launches
+     * @param primaryStage
+     * @throws Exception 
+     */
     @Override
     public void start(Stage primaryStage) throws Exception {
+        
+        // Initialize new population
         Population pop = new Population();
         pop.createPopulation();
-        GeneticAlgorithm GA = new GeneticAlgorithm();
-        int i = 0;
         
-        boolean terminate = false;    
+        // Initialize new Genetic Algorithm object
+        GeneticAlgorithm GA = new GeneticAlgorithm();
+        int i = 0; // Number of generation
+        
+        boolean terminate = false; // @attribute to check if the evolution needs to stop
+        
+        // List to contain the list of Best fitness value in each generation
         List<Double> fittestList = new ArrayList<>();
+        
+        // Maximum damage dealt and Minimum steps taken by player's tank
+        // in the evolution process
         double minEnemyHealth = 9999;
         int minStepsTaken = 9999;
         
+        // Keep the evolution process while the terminate conditions
+        // aren't met
         while (!terminate) {
             
+            // Create a Bound on the edge of the stage
             Path bound = new Bounds().getBounds();
-            RotateTransition boundColl = new RotateTransition();
+            
+            // Create new Tank objects for Player and enemy
             Tank player = new Tank(".\\sprite\\Tank-GTAA-1.png", "player");
             Tank enemy = new Tank(".\\sprite\\Tank-GTAA-1.png", "enemy");
+            
+            // Create new Stage to show the battle process
             Stage stage = new Stage();
+            
+            // List to contain the bullet object that will be shown
+            // in the battle
             List<Ellipse> listBullet = new ArrayList<>();
             
+            // Show the hint of each tanks
+            Text tanks = new Text(800, 580, "Player's Tank = Left, Enemy's Tank = Right");
+            tanks.setFont(Font.font("Verdana", 12));
+            
+            // Number of generation (from 1)
             int j = i+1;
             
+            // Randomize a double number to decide which one of
+            // the evolution process that will be used
             double evol = new Random().nextDouble();
             
+            // If the number is less than crossover rate (0.9), then
+            // choose crossover process
+            // Else, choose mutation process
             if (evol < GA.getCrossoverRate()) {
+                
+                // Call survivor selection process with the child
+                // produced from crossover process
                 GA.survivorSelection(GA.crossover(pop), pop);
+                
             } else {
+                
+                // Randomize the index of the chromosome that will be
+                // used in mutation process
                 int idx = new Random().nextInt(pop.getPopulation().length);
+                
+                // Get the chromosome in the index position
                 Chromosome mutant = pop.getPopulation()[idx];
+                
+                // Calls mutation process
                 GA.mutation(mutant);
                 pop.getPopulation()[idx] = mutant;
+                
             }
             
+            // Get the chromosome with highest fitness value in
+            // current population
             Chromosome c = pop.getFittest();
             
             fittestList.add(c.getFitness());
@@ -199,7 +247,7 @@ public class Main extends Application {
             ImageView playerObj = player.getTank();
             ImageView enemyObj = enemy.getTank();
 
-            Group root = new Group(playerObj, enemyObj, bound, text1, text2);
+            Group root = new Group(playerObj, enemyObj, bound, text1, text2, tanks);
             for (Ellipse e : listBullet) {
                 root.getChildren().add(e);
             }
