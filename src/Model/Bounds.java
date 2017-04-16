@@ -14,25 +14,36 @@ import javafx.scene.shape.Path;
  * @author rizzauliarahman
  */
 public class Bounds {
-    Path path;
+    Path path; // Line that will be the arena boundary
     
+    // Constructor to create new rectangular line
     public Bounds() {
-        path = new Path();
+        path = new Path(); // Create new path object
         
+        // Initialize the initial point of the line
         MoveTo moveTo = new MoveTo(0, 0);
         
+        // Create the first line
         LineTo line1 = new LineTo(0, 600);
         
+        // Create the second line
         LineTo line2 = new LineTo(1200, 600);
         
+        // Create the third line
         LineTo line3 = new LineTo(1200, 0);
         
+        // Create the fourth line
         LineTo line4 = new LineTo(0, 0);
         
+        // Add the path initial point
         path.getElements().add(moveTo);
+        
+        // Add all the line that has been created to
+        // the path
         path.getElements().addAll(line1, line2, line3, line4);
     }
     
+    // Return the path that has been created
     public Path getBounds() {
         return path;
     }

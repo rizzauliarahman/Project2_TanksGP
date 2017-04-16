@@ -124,19 +124,41 @@ public class Main extends Application {
             // current population
             Chromosome c = pop.getFittest();
             
+            // add the fitness value of the fittest chromosome to
+            // the fittestList and convert it into an array
             fittestList.add(c.getFitness());
             Double[] tmp = new Double[fittestList.size()];
             tmp = fittestList.toArray(tmp);
 
+            // Create new list to contain the animation of player
+            // moves
             List<Animation> listAnim = new ArrayList<>();
             
+            // Generate (Randomize) the enemy moves, where the length
+            // of the moves is equal to the player's moves
             Chromosome enemyMoves = GA.enemyMoves(c.getGenes().length);
             
+            // Create new list to contain the animation of enemy
+            // moves
             List<Animation> listEnemy = new ArrayList<>();
             
-            for (int m = 0; m < c.getGenes().length; m++) {
+            // Keep visualizing the moves until player's health or
+            // enemy's health is equal to 0, or until all the moves
+            // has been visualized
+            int m = 0;
+            
+            do {
+                
+                // Get the the move on the m-position for each
+                // player's and enemy's tank
                 String s = c.getGenes()[m];
                 String e = enemyMoves.getGenes()[m];
+                
+                // Create animation based on whether the moves is
+                // walk, turn right or left, or fire a bullet and
+                // add it to the list of player and enemy moves
+                
+//                ==================== PLAYER MOVE ========================
                 if (s.equals("walk")) {
                     TranslateTransition translate = player.walk();
                     listAnim.add(translate);
@@ -147,12 +169,13 @@ public class Main extends Application {
                     RotateTransition rotate = player.turnLeft();
                     listAnim.add(rotate);
                 } else if (s.equals("fire")) {
-//                    System.out.print("fire ");
                     TranslateTransition translate = player.fire(enemy);
 
                     Ellipse bullet = player.getBullet().getBullet();
                     listBullet.add(bullet);
 
+                    // Create fade transition after the bullet has been
+                    // fired
                     FadeTransition fade1 = new FadeTransition(Duration.millis(10), player.getBullet().getBullet());
                     fade1.setFromValue(0);
                     fade1.setToValue(1);
@@ -167,7 +190,9 @@ public class Main extends Application {
                     listAnim.add(translate);
                     listAnim.add(fade2);
                 }
+
                 
+//                ==================== ENEMY MOVE ==========================
                 if (e.equals("walk")) {
                     TranslateTransition translate = enemy.walk();
                     listEnemy.add(translate);
@@ -178,12 +203,13 @@ public class Main extends Application {
                     RotateTransition rotate = enemy.turnLeft();
                     listEnemy.add(rotate);
                 } else if (e.equals("fire")) {
-//                    System.out.print("fire ");
                     TranslateTransition translate = enemy.fire(player);
 
                     Ellipse bullet = enemy.getBullet().getBullet();
                     listBullet.add(bullet);
 
+                    // Create fade transition after the bullet has been
+                    // fired
                     FadeTransition fade1 = new FadeTransition(Duration.millis(10), enemy.getBullet().getBullet());
                     fade1.setFromValue(0);
                     fade1.setToValue(1);
@@ -198,8 +224,17 @@ public class Main extends Application {
                     listEnemy.add(translate);
                     listEnemy.add(fade2);
                 }
-            }
+
+                m++;
+                
+            } while ((player.getHealth() > 0) && (enemy.getHealth() > 0) && (m < c.getGenes().length));
             
+            // Check if the remaining health of the enemy's tank is
+            // less than the minimum health got by the previous
+            // generation(s)
+            // If the health is equal to the minimum health, check
+            // if the steps taken is less than the minimum steps
+            // taken in previous generation(s)
             if (enemy.getHealth() == minEnemyHealth) {
                 if (c.getGenes().length < minStepsTaken) {
                     minStepsTaken = c.getGenes().length;
@@ -209,18 +244,28 @@ public class Main extends Application {
                 minStepsTaken = c.getGenes().length;
             }
             
+            // Create text to show the status of each tank in current
+            // generation, and the generation(s) count
             Text text1 = new Text(10, 560, "Generation - " + j + ", Enemy Health Remaining : " + 
                     enemy.getHealth() + ", Player Health Remaining : " + player.getHealth());
+            
+            // Show the best record of minimum enemy's health remaining
+            // and the steps taken
             Text text2 = new Text(10, 580, "Best Record : " + minEnemyHealth + " health remaining with " +
                     minStepsTaken + " steps taken");
             text1.setFont(Font.font("Verdana", 12));
             text2.setFont(Font.font("Verdana", 12));
             
+            // Create a pause transition to call the @method
+            // stage.close() (to close the current window so
+            // the visualization of next generation can be
+            // shown up)
             PauseTransition delay = new PauseTransition(Duration.millis(2000));
             delay.setOnFinished(event -> stage.close());
             listAnim.add(delay);
             listEnemy.add(delay);
             
+            // Convert list of player's animation to an array
             Animation[] anim = new Animation[listAnim.size()];
             anim = listAnim.toArray(anim);
             
@@ -229,46 +274,64 @@ public class Main extends Application {
 //            
 //            par.play();
             
+            // Convert list of enemy moves to an array
             Animation[] enemyMovement = new Animation[listEnemy.size()];
             enemyMovement = listEnemy.toArray(enemyMovement);
             
+            // Groups all animation of player's tank and play it
             SequentialTransition seq1 = new SequentialTransition(anim);
             seq1.play();
             
+            // Groups all animation of enemy's tank and play it
             SequentialTransition seq2 = new SequentialTransition(enemyMovement);
             seq2.play();
             
+            // NOTE : In JavaFX, both animation (player and enemy)
+            //        will be played simultaneously
+            
             i++;
             
+            // Check if the termination condition is met
             terminate = GA.termination(tmp, pop);
             
-//            terminate = true;
-            
+            // Get the image visualization of each tank
             ImageView playerObj = player.getTank();
             ImageView enemyObj = enemy.getTank();
 
+            // Groups all image (player's tank, enemy's tank,
+            // the boundary, and text)
             Group root = new Group(playerObj, enemyObj, bound, text1, text2, tanks);
             for (Ellipse e : listBullet) {
                 root.getChildren().add(e);
             }
 
+            // Set the group of all images in new scene and
+            // set the scene's fill color
             Scene scene = new Scene(root, 1200, 600);
             scene.setFill(Color.LIGHTYELLOW);
 
+            // Set the title of the window
             stage.setTitle("Load Tank");
 
+            // Add the scene to the window
             stage.setScene(scene);
-
+            
+            // Show the visualization window and wait until
+            // @method stage.close() is called
             stage.showAndWait();
             
         }
         
+        // If all process is done, show the generations
+        // generated in the process, the minimum steps
+        // taken, and maximum damage dealt
         System.out.println("Generations count : " + i);
         System.out.println("Minimum Steps count : " + minStepsTaken);
         System.out.println("Maximum Damage Dealt : " + (100 - minEnemyHealth));
         
     }
     
+    // @method to call the @start method
     public static void main(String[] args) {
        launch(args);
     }
