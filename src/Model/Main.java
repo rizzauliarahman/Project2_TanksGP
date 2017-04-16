@@ -224,6 +224,39 @@ public class Main extends Application {
                     listEnemy.add(translate);
                     listEnemy.add(fade2);
                 }
+                
+                // Check if player's tank or enemy's tank health reach 0
+                // If yes, create new text "ENEMY WINS" or "PLAYER WINS"
+                // and add the pause after that for 5 seconds
+                if (player.getHealth() <= 0) {
+                    Text enemyWins = new Text(400, 50, "ENEMY WINS");
+                    enemyWins.setFont(Font.font("Verdana", 40));
+                    
+                    FadeTransition fade3 = new FadeTransition(Duration.millis(10), enemyWins);
+                    fade3.setFromValue(0);
+                    fade3.setToValue(1);
+                    fade3.setCycleCount(1);
+                    
+                    PauseTransition wins = new PauseTransition(Duration.millis(5000));
+                    listAnim.add(fade3);
+                    listAnim.add(wins);
+                    listEnemy.add(fade3);
+                    listEnemy.add(wins);
+                } else if (enemy.getHealth() <= 0) {
+                    Text playerWins = new Text(400, 50, "PLAYER WINS");
+                    playerWins.setFont(Font.font("Verdana", 40));
+                    
+                    FadeTransition fade3 = new FadeTransition(Duration.millis(10), playerWins);
+                    fade3.setFromValue(0);
+                    fade3.setToValue(1);
+                    fade3.setCycleCount(1);
+                    
+                    PauseTransition wins = new PauseTransition(Duration.millis(5000));
+                    listAnim.add(fade3);
+                    listAnim.add(wins);
+                    listEnemy.add(fade3);
+                    listEnemy.add(wins);
+                }
 
                 m++;
                 

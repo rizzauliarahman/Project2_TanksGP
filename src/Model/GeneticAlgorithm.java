@@ -17,17 +17,15 @@ import java.util.Set;
  * @author rizzauliarahman
  */
 public class GeneticAlgorithm {
-    
     // Array to contain the parent chromosome in
     // the generation
-    Chromosome[] parent;
-    
+    private Chromosome[] parent;
     // Number of chromosome to be in selection on
     // tournament parent selection method
-    int tournamentSize = 3;
-    
+    private int tournamentSize = 3;
     // Set the crossover and mutation rate
-    double crossoverRate = 0.9, mutationRate = 0.1;
+    private double crossoverRate = 0.9, mutationRate = 0.1;
+    
     
     // @method to do the roulette survivor selection
     public Chromosome[] roulette(Population pop) {

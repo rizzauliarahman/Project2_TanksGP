@@ -18,14 +18,13 @@ import javafx.util.Duration;
  * @author asprak101
  */
 public class Bullet {
-    Ellipse ellipse; // The shape of the bullet
-    
+    private Ellipse ellipse; // The shape of the bullet    
     // init_x and init_y = the initial position of the bullet
     // dx and dy = the position change of the bullet
     // x_pos and y_pos = the current position of the bullet
-    double init_x, init_y, dx = 0, dy = 0, x_pos, y_pos;
+    private double init_x, init_y, dx = 0, dy = 0, x_pos, y_pos;
+    private int power; // the power of the bullet
     
-    int power; // the power of the bullet
     
     // Constructor to create new bullet shape
     public Bullet(double x_pos, double y_pos, double direction) {

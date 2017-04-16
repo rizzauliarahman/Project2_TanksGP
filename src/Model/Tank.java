@@ -24,23 +24,21 @@ import javafx.util.Duration;
  * @author rizzauliarahman
  */
 public class Tank {
-    Image image; // Tank image loaded from the file
-    ImageView object; // Visualization of the image
-    
+    private Image image; // Tank image loaded from the file
+    private ImageView object; // Visualization of the image
     // init_dir = the initial direction of the tank
     // current_dir = the current direction of the tank
-    double init_dir, current_dir;
-    
+    private double init_dir, current_dir;
     // init_x and init_y = the initial position of the tank
     // dx and dy = the position change of the tank
     // x_pos and y_pos = the current position of the tank
-    double init_x, init_y, dx = 0, dy = 0, x_pos, y_pos;
-    
+    private double init_x, init_y, dx = 0, dy = 0, x_pos, y_pos;
     // gun_x and gun_y = position of the tanks gun
-    double gun_x, gun_y;
-    int health; // the tank's health
-    Bullet bulletObj; // the image visualization of the tank's bullet
-    String name; // the name of the tanks
+    private double gun_x, gun_y;
+    private int health; // the tank's health
+    private Bullet bulletObj; // the image visualization of the tank's bullet
+    private String name; // the name of the tanks
+    
     
     // The constructor of tank object
     public Tank(String filename, String type) throws Exception {

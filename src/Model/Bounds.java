@@ -14,7 +14,8 @@ import javafx.scene.shape.Path;
  * @author rizzauliarahman
  */
 public class Bounds {
-    Path path; // Line that will be the arena boundary
+    private Path path; // Line that will be the arena boundary
+    
     
     // Constructor to create new rectangular line
     public Bounds() {
