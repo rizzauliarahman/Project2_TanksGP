@@ -56,9 +56,12 @@ public class Tank {
         // the right side and position to (200, 200), and
         // initial gun position to (250, 215)
         if (type.toUpperCase().equals("PLAYER")) {
+            int[] yrandom = {200, 300};
+            int[] xrandom = {200, 400};
+            
             object.setRotate(180);
-            object.setX(400);
-            object.setY(200);
+            object.setX(xrandom[new Random().nextInt(xrandom.length)]);
+            object.setY(yrandom[new Random().nextInt(yrandom.length)]);
             gun_x = object.getX() + 50;
             gun_y = object.getY() + 15;
             
@@ -68,8 +71,11 @@ public class Tank {
         // Set the Sepia effect to the tank to distinguish it from
         // player's tank
         } else if (type.toUpperCase().equals("ENEMY")) {
-            object.setX(800);
-            object.setY(300);
+            int[] yrandom = {200, 300};
+            int[] xrandom = {800, 1000};
+            
+            object.setX(xrandom[new Random().nextInt(xrandom.length)]);
+            object.setY(yrandom[new Random().nextInt(yrandom.length)]);
             gun_x = object.getX();
             gun_y = object.getY() + 15;
             object.setEffect(new SepiaTone(0.5));
