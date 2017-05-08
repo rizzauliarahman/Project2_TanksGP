@@ -40,6 +40,9 @@ public class Population {
     // @method to initialize the chromosomes in population
     public void createPopulation() {
         
+        population = new Chromosome[10];
+        nChromosome = 0;
+        
         // @attribute c to contain the generated chromosome
         Chromosome c;
         

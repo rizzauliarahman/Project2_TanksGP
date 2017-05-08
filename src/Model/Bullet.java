@@ -133,11 +133,11 @@ public class Bullet {
             // Call @method getHit in tank object
             tank.getHit(power);
             
-            // If the tank health is less than 0 when
-            // hit by the bullet, destroy the tank
-            if (tank.getHealth() <= 0) {
-                tank.destroy();
-            }
+//            // If the tank health is less than 0 when
+//            // hit by the bullet, destroy the tank
+//            if (tank.getHealth() <= 0) {
+//                tank.destroy();
+//            }
         }
         
         // Return the generated animation

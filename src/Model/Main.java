@@ -134,10 +134,6 @@ public class Main extends Application {
             // moves
             List<Animation> listAnim = new ArrayList<>();
             
-            // Generate (Randomize) the enemy moves, where the length
-            // of the moves is equal to the player's moves
-            Chromosome enemyMoves = GA.enemyMoves(c.getGenes().length);
-            
             // Create new list to contain the animation of enemy
             // moves
             List<Animation> listEnemy = new ArrayList<>();
@@ -147,12 +143,13 @@ public class Main extends Application {
             // has been visualized
             int m = 0;
             
+            int enemyLastMove = 1;
+            
             do {
                 
                 // Get the the move on the m-position for each
                 // player's and enemy's tank
                 String s = c.getGenes()[m];
-                String e = enemyMoves.getGenes()[m];
                 
                 // Create animation based on whether the moves is
                 // walk, turn right or left, or fire a bullet and
@@ -193,6 +190,23 @@ public class Main extends Application {
 
                 
 //                ==================== ENEMY MOVE ==========================
+                String e = "fire";
+
+                if (enemy.facingEnemy(player)) {
+                    e = "fire";
+                } else {
+                    if (enemyLastMove == 0) {
+                        e = "walk";
+                        enemyLastMove = 1;
+                    } else if (enemyLastMove == 1) {
+                        e = "walk";
+                        enemyLastMove = 2;
+                    } else {
+                        e = "turnLeft";
+                        enemyLastMove = 0;
+                    }
+                }
+
                 if (e.equals("walk")) {
                     TranslateTransition translate = enemy.walk();
                     listEnemy.add(translate);
@@ -224,43 +238,40 @@ public class Main extends Application {
                     listEnemy.add(translate);
                     listEnemy.add(fade2);
                 }
-                
-                // Check if player's tank or enemy's tank health reach 0
-                // If yes, create new text "ENEMY WINS" or "PLAYER WINS"
-                // and add the pause after that for 5 seconds
-                if (player.getHealth() <= 0) {
-                    Text enemyWins = new Text(400, 50, "ENEMY WINS");
-                    enemyWins.setFont(Font.font("Verdana", 40));
-                    
-                    FadeTransition fade3 = new FadeTransition(Duration.millis(10), enemyWins);
-                    fade3.setFromValue(0);
-                    fade3.setToValue(1);
-                    fade3.setCycleCount(1);
-                    
-                    PauseTransition wins = new PauseTransition(Duration.millis(5000));
-                    listAnim.add(fade3);
-                    listAnim.add(wins);
-                    listEnemy.add(fade3);
-                    listEnemy.add(wins);
-                } else if (enemy.getHealth() <= 0) {
-                    Text playerWins = new Text(400, 50, "PLAYER WINS");
-                    playerWins.setFont(Font.font("Verdana", 40));
-                    
-                    FadeTransition fade3 = new FadeTransition(Duration.millis(10), playerWins);
-                    fade3.setFromValue(0);
-                    fade3.setToValue(1);
-                    fade3.setCycleCount(1);
-                    
-                    PauseTransition wins = new PauseTransition(Duration.millis(5000));
-                    listAnim.add(fade3);
-                    listAnim.add(wins);
-                    listEnemy.add(fade3);
-                    listEnemy.add(wins);
-                }
 
                 m++;
                 
             } while ((player.getHealth() > 0) && (enemy.getHealth() > 0) && (m < c.getGenes().length));
+            
+            // Check if player's tank or enemy's tank health reach 0
+            // If yes, create new text "ENEMY WINS" or "PLAYER WINS"
+            // and add the pause after that for 5 seconds
+            Text winner = new Text(400, 50, "NO WINNER");
+            String genWinner = "no";
+            
+            if (player.getHealth() < enemy.getHealth()) {
+                Text enemyWins = new Text(400, 50, "ENEMY WINS");
+                winner = enemyWins;
+                genWinner = "enemy";
+                
+            } else if (enemy.getHealth() < player.getHealth()) {
+                Text playerWins = new Text(400, 50, "PLAYER WINS");
+                winner = playerWins;
+                genWinner = "player";
+            }
+            
+            winner.setFont(Font.font("Verdana", 40));
+
+            FadeTransition fade3 = new FadeTransition(Duration.millis(10), winner);
+            fade3.setFromValue(0);
+            fade3.setToValue(1);
+            fade3.setCycleCount(1);
+
+            PauseTransition wins = new PauseTransition(Duration.millis(5000));
+            listAnim.add(fade3);
+            listAnim.add(wins);
+            listEnemy.add(fade3);
+            listEnemy.add(wins);
             
             // Check if the remaining health of the enemy's tank is
             // less than the minimum health got by the previous
@@ -268,6 +279,7 @@ public class Main extends Application {
             // If the health is equal to the minimum health, check
             // if the steps taken is less than the minimum steps
             // taken in previous generation(s)
+            
             if (enemy.getHealth() == minEnemyHealth) {
                 if (c.getGenes().length < minStepsTaken) {
                     minStepsTaken = c.getGenes().length;
@@ -325,7 +337,7 @@ public class Main extends Application {
             i++;
             
             // Check if the termination condition is met
-            terminate = GA.termination(tmp, pop);
+            terminate = GA.termination(tmp, pop, genWinner);
             
             // Get the image visualization of each tank
             ImageView playerObj = player.getTank();
@@ -333,7 +345,7 @@ public class Main extends Application {
 
             // Groups all image (player's tank, enemy's tank,
             // the boundary, and text)
-            Group root = new Group(playerObj, enemyObj, bound, text1, text2, tanks);
+            Group root = new Group(playerObj, enemyObj, bound, text1, text2, tanks, winner);
             for (Ellipse e : listBullet) {
                 root.getChildren().add(e);
             }

@@ -81,33 +81,6 @@ public class Chromosome {
         
     }
     
-    // @method to create the enemy's tank chromosome
-    public void createEnemyGenes(int stepsCount) {
-        
-        // Create a list to contain the generated steps
-        List<String> list = new ArrayList<>();
-        
-        // Repeat randomize the step while the steps taken
-        // count is less than the number of player's tank
-        // steps
-        for (int i = 0; i < stepsCount; i++) {
-            
-            // Get a random step from available steps
-            String taken = this.steps[new Random().nextInt(steps.length)];
-            
-            // Add the taken step to the list
-            list.add(taken);            
-        }
-        
-        // Convert the list into an array, and set
-        // this chromosome's step with that array
-        // Set this chromosome's fitness
-        this.genes = new String[list.size()];
-        this.genes = list.toArray(this.genes);
-        setFitness();
-        
-    }
-    
     // Return the available steps
     public String[] getSteps() {
         return steps;

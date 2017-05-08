@@ -57,7 +57,7 @@ public class Tank {
         // initial gun position to (250, 215)
         if (type.toUpperCase().equals("PLAYER")) {
             object.setRotate(180);
-            object.setX(200);
+            object.setX(400);
             object.setY(200);
             gun_x = object.getX() + 50;
             gun_y = object.getY() + 15;
@@ -68,8 +68,8 @@ public class Tank {
         // Set the Sepia effect to the tank to distinguish it from
         // player's tank
         } else if (type.toUpperCase().equals("ENEMY")) {
-            object.setX(1000);
-            object.setY(200);
+            object.setX(800);
+            object.setY(300);
             gun_x = object.getX();
             gun_y = object.getY() + 15;
             object.setEffect(new SepiaTone(0.5));
@@ -105,7 +105,7 @@ public class Tank {
         // Create new TranslateTransition object to contain
         // the movement of the tank, and set the Node of this object
         // to the tank
-        TranslateTransition translate = new TranslateTransition(Duration.millis(500));
+        TranslateTransition translate = new TranslateTransition(Duration.millis(250));
         translate.setNode(object);
         
         // Initialize the position change of tank with 0
@@ -198,7 +198,7 @@ public class Tank {
         // Create new RotateTransition object to contain
         // the rotation of the tank, and set the Node of this object
         // to the tank
-        RotateTransition rotate = new RotateTransition(Duration.millis(500));
+        RotateTransition rotate = new RotateTransition(Duration.millis(250));
         rotate.setNode(object);
         
         // Rotate the tank by 90 degrees, and change its
@@ -248,7 +248,7 @@ public class Tank {
         // Create new RotateTransition object to contain
         // the rotation of the tank, and set the Node of this object
         // to the tank
-        RotateTransition rotate = new RotateTransition(Duration.millis(500));
+        RotateTransition rotate = new RotateTransition(Duration.millis(250));
         rotate.setNode(object);
         
         // Rotate the tank by -90 degrees, and change its
@@ -297,7 +297,7 @@ public class Tank {
         // Create new TranslateTransition object to contain
         // the movement of the tank, and set the Node of this object
         // to the tank
-        TranslateTransition translate = new TranslateTransition(Duration.millis(500));
+        TranslateTransition translate = new TranslateTransition(Duration.millis(250));
         translate.setNode(object);
         
         // Set the position change of the tank to 0
@@ -395,12 +395,36 @@ public class Tank {
     // return the rectangle that bound the tank's
     // image
     public Rectangle2D getBoundary() {
-        return new Rectangle2D(x_pos, y_pos, 75, 75);
+        return new Rectangle2D(x_pos, y_pos, 50, 50);
+    }
+    
+    public boolean facingEnemy(Tank tank) {
+        Rectangle2D radar;
+        
+        if (this.current_dir == 0) {
+            radar = new Rectangle2D(0, y_pos, x_pos, 50);
+        } else if (this.current_dir == 90) {
+            radar = new Rectangle2D(x_pos, 0, 50, y_pos);
+        } else if (this.current_dir == 180) {
+            radar = new Rectangle2D(x_pos, y_pos, (1200-x_pos), 50);
+        } else {
+            radar = new Rectangle2D(x_pos, y_pos, 50, (600-y_pos));
+        }
+        
+        if ((radar.intersects(tank.getBoundary()))) {
+            return true;
+        } else {
+            return false;
+        }
     }
     
     // Hide the tanks
     public void destroy() {
         object.setVisible(false);
+    }
+    
+    public double getDirection() {
+        return current_dir;
     }
     
 }
