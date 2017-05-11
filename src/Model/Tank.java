@@ -404,9 +404,12 @@ public class Tank {
         return new Rectangle2D(x_pos, y_pos, 50, 50);
     }
     
+    // Check if this tank is facing the other tank(s)
     public boolean facingEnemy(Tank tank) {
         Rectangle2D radar;
         
+        // Check the area in front of the tank based on
+        // its current direction
         if (this.current_dir == 0) {
             radar = new Rectangle2D(0, y_pos, x_pos, 50);
         } else if (this.current_dir == 90) {
@@ -417,6 +420,8 @@ public class Tank {
             radar = new Rectangle2D(x_pos, y_pos, 50, (600-y_pos));
         }
         
+        // If there's a tank in front of the tank, return true
+        // else, return false
         if ((radar.intersects(tank.getBoundary()))) {
             return true;
         } else {
@@ -429,6 +434,7 @@ public class Tank {
         object.setVisible(false);
     }
     
+    // Get the direction this tank's facing
     public double getDirection() {
         return current_dir;
     }

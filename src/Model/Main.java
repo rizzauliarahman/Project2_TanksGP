@@ -190,11 +190,13 @@ public class Main extends Application {
 
                 
 //                ==================== ENEMY MOVE ==========================
+                // Create new string that represents enemy move
                 String e = "fire";
 
+                // Check if the enemy is facing the player's tank
                 if (enemy.facingEnemy(player)) {
                     e = "fire";
-                } else {
+                } else { // If it's not, mak a round moves
                     if (enemyLastMove == 0) {
                         e = "walk";
                         enemyLastMove = 1;
@@ -207,6 +209,8 @@ public class Main extends Application {
                     }
                 }
 
+                // Check which step is taken by enemy tank and
+                // Create animation of it
                 if (e.equals("walk")) {
                     TranslateTransition translate = enemy.walk();
                     listEnemy.add(translate);
